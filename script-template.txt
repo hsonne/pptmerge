@@ -1,0 +1,45 @@
+'PPTmerge – merges several PowerPoint presentations (.PPT files) together
+'Author: George Birbilis (birbilis@kagi.com) / Zoomicon (www.zoomicon.com)
+'Version: 12Dec2007
+
+Const PPTMERGE_FILE = "<PPT_MERGE_FILE>"
+Const PPTMERGE_FOLDER = "<PPT_MERGE_FOLDER>"
+
+Dim Application
+Dim first
+Dim fs
+Dim folder
+Dim out
+Dim ff
+Dim f
+
+Set Application = CreateObject("PowerPoint.Application")
+Application.Visible = True 'must do this for merge to work
+
+first = True
+Set fs = CreateObject("Scripting.FileSystemObject")
+Set folder = fs.GetFolder(PPTMERGE_FOLDER)
+
+For Each ff in folder.Files
+  f = PPTMERGE_FOLDER + "\" + ff.Name
+  If first Then
+    Set out = Application.Presentations.Open(f)
+    out.SaveAs PPTMERGE_FOLDER + "\..\" + PPTMERGE_FILE
+    first = False
+  Else
+    out.Slides.InsertFromFile f, out.Slides.Count
+  End If
+Next
+
+If Not first Then
+  out.Save
+  out.SlideShowSettings.Run
+  out.Close
+End If
+
+Application.Quit
+
+Set Application = Nothing
+Set out = Nothing
+Set folder = Nothing
+Set fs = Nothing
